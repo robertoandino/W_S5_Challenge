@@ -1,3 +1,4 @@
+
 async function sprintChallenge5() { // Note the async keyword so you can use `await` inside sprintChallenge5
   // 👇 WORK ONLY BELOW THIS LINE 👇
   // 👇 WORK ONLY BELOW THIS LINE 👇
@@ -9,12 +10,52 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
   // ❗ Use the variables `mentors` and `learners` to store the data.
   // ❗ Use the await keyword when using axios.
 
-  let mentors = [] // fix this
-  let learners = [] // fix this
-
+  const learners1 = await axios.get('http://localhost:3003/api/learners') // fix this
+  const mentors1 = await axios.get('http://localhost:3003/api/mentors') // fix this
+  
+  //console.log(mentors1.data)
+  //console.log(learners1.data)
   // 👆 ==================== TASK 1 END ====================== 👆
 
   // 👇 ==================== TASK 2 START ==================== 👇
+
+  let learners = {}
+  let mentors = {}
+
+  //storing learners1 data into learners object
+  for(const key in learners1.data){
+  
+    learners[key] = learners1.data[key]
+    
+  }
+
+  //storing mentors1 data into mentors object
+  for(const key in mentors1.data){
+  
+    mentors[key] = mentors1.data[key]
+    
+  }
+
+  //Matching learners mentors id with mentors id and replacing the id with mentors name.
+  for(const key in mentors){
+
+    for(const learnerKey in learners){
+      
+      for(const mentorIdKey in learners[learnerKey].mentors)
+      {
+        if(learners[learnerKey].mentors[mentorIdKey] === mentors[key].id){
+          learners[learnerKey].mentors[mentorIdKey] = mentors[key].firstName + " " + mentors[key].lastName;
+        }
+      }
+      
+    }
+  }
+  //console.log(mentors[0].id)
+  //console.log(learners[0].mentors);
+
+  console.log(learners[0])
+  console.log(learners[0].mentors[0])
+
 
   // 🧠 Combine learners and mentors.
   // ❗ At this point the learner objects only have the mentors' IDs.
@@ -38,7 +79,7 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
 
   // 👇 ==================== TASK 3 START ==================== 👇
 
-  for (let learner of learners) { // looping over each learner object
+  for (let learner in learners) { // looping over each learner object
 
     // 🧠 Flesh out the elements that describe each learner
     // ❗ Give the elements below their (initial) classes, textContent and proper nesting.
@@ -52,14 +93,36 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
     const email = document.createElement('div')
     const mentorsHeading = document.createElement('h4')
     const mentorsList = document.createElement('ul')
+    //const mentor = document.createElement('li');
+
+    card.className = 'card';
+
+    heading.textContent = learners[learner].fullName;
+    card.appendChild(heading);
+    email.textContent = learners[learner].email
+    card.appendChild(email);
+    mentorsHeading.className = 'closed'
+    mentorsHeading.textContent = "Mentors"
+    card.appendChild(mentorsHeading);
+    for(let mentorKey in learners[learner].mentors){
+      //mentorsHeading.textContent = learners[learner].mentors[mentorKey]
+      const mentor = document.createElement('li');
+      //mentor.textContent = mentorsHeading;
+      mentor.textContent = learners[learner].mentors[mentorKey]
+      mentorsList.appendChild(mentor)
+    }
+    //mentorsHeading.appendChild(mentorsList)
+    //card.appendChild(mentorsHeading)
+
 
     // 👆 ==================== TASK 3 END ====================== 👆
+
 
     // 👆 WORK ONLY ABOVE THIS LINE 👆
     // 👆 WORK ONLY ABOVE THIS LINE 👆
     // 👆 WORK ONLY ABOVE THIS LINE 👆
     card.appendChild(mentorsList)
-    card.dataset.fullName = learner.fullName
+    card.dataset.fullName = learners[learner].fullName
     cardsContainer.appendChild(card)
 
     card.addEventListener('click', evt => {
@@ -79,8 +142,8 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
         if (!isCardSelected) {
           // selecting the card:
           card.classList.add('selected')
-          heading.textContent += `, ID ${learner.id}`
-          info.textContent = `The selected learner is ${learner.fullName}`
+          heading.textContent += `, ID ${learners[learner].id}`
+          info.textContent = `The selected learner is ${learners[learner].fullName}`
         }
       } else {
         // clicked on mentors, we toggle and select no matter what
@@ -92,8 +155,8 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
         }
         if (!isCardSelected) {
           // if card was not selected adjust texts
-          heading.textContent += `, ID ${learner.id}`
-          info.textContent = `The selected learner is ${learner.fullName}`
+          heading.textContent += `, ID ${learners[learner].id}`
+          info.textContent = `The selected learner is ${learners[learner].fullName}`
         }
       }
     })
